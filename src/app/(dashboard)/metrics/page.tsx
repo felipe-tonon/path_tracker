@@ -3,16 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { 
-  BarChart3, 
-  RefreshCw, 
-  Clock, 
-  Globe, 
-  Cpu, 
-  DollarSign,
-  Activity,
-  Zap
-} from 'lucide-react';
+import { BarChart3, RefreshCw, Clock, Globe, Cpu, DollarSign, Activity, Zap } from 'lucide-react';
 
 interface MetricsResponse {
   period: {
@@ -58,7 +49,7 @@ export default function MetricsPage() {
     try {
       const now = new Date();
       let startTime: Date;
-      
+
       switch (timeRange) {
         case '1h':
           startTime = new Date(now.getTime() - 60 * 60 * 1000);
@@ -98,6 +89,7 @@ export default function MetricsPage() {
 
   useEffect(() => {
     fetchMetrics();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [timeRange]);
 
   const formatNumber = (num: number) => {
@@ -121,7 +113,7 @@ export default function MetricsPage() {
           <h1 className="text-3xl font-bold">Metrics</h1>
           <p className="text-muted-foreground">Aggregated analytics and trends</p>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           {/* Time Range */}
           <div className="flex gap-1">
             {(['1h', '6h', '24h', '7d'] as const).map((range) => (
@@ -136,7 +128,7 @@ export default function MetricsPage() {
             ))}
           </div>
           <Button variant="outline" onClick={fetchMetrics} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -152,7 +144,7 @@ export default function MetricsPage() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading metrics...</div>
+        <div className="py-12 text-center text-muted-foreground">Loading metrics...</div>
       ) : metrics ? (
         <div className="space-y-6">
           {/* Summary Cards */}
@@ -164,10 +156,13 @@ export default function MetricsPage() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {formatNumber(metrics.metrics.rest_requests.total + metrics.metrics.llm_requests.total)}
+                  {formatNumber(
+                    metrics.metrics.rest_requests.total + metrics.metrics.llm_requests.total
+                  )}
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {formatNumber(metrics.metrics.rest_requests.total)} REST + {formatNumber(metrics.metrics.llm_requests.total)} LLM
+                  {formatNumber(metrics.metrics.rest_requests.total)} REST +{' '}
+                  {formatNumber(metrics.metrics.llm_requests.total)} LLM
                 </p>
               </CardContent>
             </Card>
@@ -227,29 +222,35 @@ export default function MetricsPage() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {/* Latency */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
                     <Clock className="h-4 w-4" />
                     Latency Percentiles
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p50</span>
-                      <span className="font-mono">{metrics.metrics.rest_requests.latency.p50}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.rest_requests.latency.p50}ms
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p95</span>
-                      <span className="font-mono">{metrics.metrics.rest_requests.latency.p95}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.rest_requests.latency.p95}ms
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p99</span>
-                      <span className="font-mono">{metrics.metrics.rest_requests.latency.p99}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.rest_requests.latency.p99}ms
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* By Service */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3">By Service</h4>
+                  <h4 className="mb-3 text-sm font-medium">By Service</h4>
                   <div className="space-y-2">
                     {Object.entries(metrics.metrics.rest_requests.by_service).length === 0 ? (
                       <p className="text-sm text-muted-foreground">No data</p>
@@ -268,20 +269,22 @@ export default function MetricsPage() {
 
                 {/* By Status */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3">By Status Code</h4>
+                  <h4 className="mb-3 text-sm font-medium">By Status Code</h4>
                   <div className="space-y-2">
                     {Object.entries(metrics.metrics.rest_requests.by_status).length === 0 ? (
                       <p className="text-sm text-muted-foreground">No data</p>
                     ) : (
-                      Object.entries(metrics.metrics.rest_requests.by_status).map(([status, count]) => (
-                        <div key={status} className="flex items-center justify-between text-sm">
-                          <div className="flex items-center gap-2">
-                            <div className={`h-2 w-2 rounded-full ${getStatusColor(status)}`} />
-                            <span className="font-mono">{status}</span>
+                      Object.entries(metrics.metrics.rest_requests.by_status).map(
+                        ([status, count]) => (
+                          <div key={status} className="flex items-center justify-between text-sm">
+                            <div className="flex items-center gap-2">
+                              <div className={`h-2 w-2 rounded-full ${getStatusColor(status)}`} />
+                              <span className="font-mono">{status}</span>
+                            </div>
+                            <span className="font-mono">{formatNumber(count)}</span>
                           </div>
-                          <span className="font-mono">{formatNumber(count)}</span>
-                        </div>
-                      ))
+                        )
+                      )
                     )}
                   </div>
                 </div>
@@ -304,46 +307,54 @@ export default function MetricsPage() {
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {/* Latency */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3 flex items-center gap-2">
+                  <h4 className="mb-3 flex items-center gap-2 text-sm font-medium">
                     <Clock className="h-4 w-4" />
                     Latency Percentiles
                   </h4>
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p50</span>
-                      <span className="font-mono">{metrics.metrics.llm_requests.latency.p50}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.llm_requests.latency.p50}ms
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p95</span>
-                      <span className="font-mono">{metrics.metrics.llm_requests.latency.p95}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.llm_requests.latency.p95}ms
+                      </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">p99</span>
-                      <span className="font-mono">{metrics.metrics.llm_requests.latency.p99}ms</span>
+                      <span className="font-mono">
+                        {metrics.metrics.llm_requests.latency.p99}ms
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 {/* By Provider */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3">By Provider</h4>
+                  <h4 className="mb-3 text-sm font-medium">By Provider</h4>
                   <div className="space-y-2">
                     {Object.entries(metrics.metrics.llm_requests.by_provider).length === 0 ? (
                       <p className="text-sm text-muted-foreground">No data</p>
                     ) : (
-                      Object.entries(metrics.metrics.llm_requests.by_provider).map(([provider, count]) => (
-                        <div key={provider} className="flex justify-between text-sm">
-                          <span className="truncate text-muted-foreground">{provider}</span>
-                          <span className="font-mono">{formatNumber(count)}</span>
-                        </div>
-                      ))
+                      Object.entries(metrics.metrics.llm_requests.by_provider).map(
+                        ([provider, count]) => (
+                          <div key={provider} className="flex justify-between text-sm">
+                            <span className="truncate text-muted-foreground">{provider}</span>
+                            <span className="font-mono">{formatNumber(count)}</span>
+                          </div>
+                        )
+                      )
                     )}
                   </div>
                 </div>
 
                 {/* By Model */}
                 <div>
-                  <h4 className="text-sm font-medium mb-3">By Model</h4>
+                  <h4 className="mb-3 text-sm font-medium">By Model</h4>
                   <div className="space-y-2">
                     {Object.entries(metrics.metrics.llm_requests.by_model).length === 0 ? (
                       <p className="text-sm text-muted-foreground">No data</p>
@@ -366,11 +377,9 @@ export default function MetricsPage() {
       ) : (
         <Card>
           <CardContent className="py-12 text-center">
-            <BarChart3 className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">No Metrics Available</h3>
-            <p className="text-muted-foreground">
-              Start tracking requests to see analytics here.
-            </p>
+            <BarChart3 className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-medium">No Metrics Available</h3>
+            <p className="text-muted-foreground">Start tracking requests to see analytics here.</p>
           </CardContent>
         </Card>
       )}

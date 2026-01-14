@@ -223,9 +223,7 @@ export async function createApiKey(
 /**
  * List all API keys for a tenant
  */
-export async function listApiKeys(
-  tenantId: string
-): Promise<
+export async function listApiKeys(tenantId: string): Promise<
   Array<{
     key_id: string;
     name: string;
@@ -304,9 +302,10 @@ export async function updateApiKeyName(
   keyId: string,
   name: string
 ): Promise<boolean> {
-  const result = await query(
-    `UPDATE api_keys SET name = $1 WHERE key_id = $2 AND tenant_id = $3`,
-    [name, keyId, tenantId]
-  );
+  const result = await query(`UPDATE api_keys SET name = $1 WHERE key_id = $2 AND tenant_id = $3`, [
+    name,
+    keyId,
+    tenantId,
+  ]);
   return result.rowCount !== null && result.rowCount > 0;
 }

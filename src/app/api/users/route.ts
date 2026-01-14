@@ -54,10 +54,12 @@ export async function GET(request: NextRequest) {
     }
 
     const { limit } = parseResult.data;
-    
+
     // Default to last 30 days
     const now = new Date();
-    const startTime = parseResult.data.start_time || new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const startTime =
+      parseResult.data.start_time ||
+      new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
     const endTime = parseResult.data.end_time || now.toISOString();
 
     // Query user stats from both REST and LLM events

@@ -38,7 +38,7 @@ export default function SettingsPage() {
 
     try {
       const response = await fetch('/api/settings');
-      
+
       if (response.ok) {
         const data = await response.json();
         const s = data.settings;
@@ -69,7 +69,7 @@ export default function SettingsPage() {
 
     try {
       const updates: Record<string, unknown> = {};
-      
+
       const newRetention = parseInt(retentionDays);
       if (!isNaN(newRetention) && newRetention !== settings?.retention_days) {
         updates.retention_days = newRetention;
@@ -145,11 +145,11 @@ export default function SettingsPage() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={fetchSettings} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button onClick={handleSave} disabled={saving || loading}>
-            <Save className="h-4 w-4 mr-2" />
+            <Save className="mr-2 h-4 w-4" />
             {saving ? 'Saving...' : 'Save Changes'}
           </Button>
         </div>
@@ -168,9 +168,9 @@ export default function SettingsPage() {
       )}
 
       {loading ? (
-        <div className="text-center py-12 text-muted-foreground">Loading settings...</div>
+        <div className="py-12 text-center text-muted-foreground">Loading settings...</div>
       ) : settings ? (
-        <div className="space-y-6 max-w-2xl">
+        <div className="max-w-2xl space-y-6">
           {/* Account Info */}
           <Card>
             <CardHeader>
@@ -203,7 +203,7 @@ export default function SettingsPage() {
               <div className="space-y-4">
                 <div className="space-y-2">
                   <Label htmlFor="retention">Retention Period (days)</Label>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
                     <Input
                       id="retention"
                       type="number"
@@ -233,7 +233,7 @@ export default function SettingsPage() {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <Label htmlFor="bodySize">Body Size Limit (KB)</Label>
-                  <div className="flex gap-2 items-center">
+                  <div className="flex items-center gap-2">
                     <Input
                       id="bodySize"
                       type="number"
@@ -257,7 +257,7 @@ export default function SettingsPage() {
                   <div className="flex items-center gap-4">
                     <button
                       onClick={() => setPiiScrubbingEnabled(true)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2 ${
                         piiScrubbingEnabled
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border hover:bg-muted'
@@ -268,7 +268,7 @@ export default function SettingsPage() {
                     </button>
                     <button
                       onClick={() => setPiiScrubbingEnabled(false)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg border ${
+                      className={`flex items-center gap-2 rounded-lg border px-4 py-2 ${
                         !piiScrubbingEnabled
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-border hover:bg-muted'
@@ -294,7 +294,7 @@ export default function SettingsPage() {
             <CardContent>
               <div className="space-y-2">
                 <Label htmlFor="budget">Monthly Budget (USD)</Label>
-                <div className="flex gap-2 items-center">
+                <div className="flex items-center gap-2">
                   <span className="text-muted-foreground">$</span>
                   <Input
                     id="budget"
@@ -308,7 +308,8 @@ export default function SettingsPage() {
                   />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Leave empty for no budget limit. You&apos;ll be alerted when approaching this amount.
+                  Leave empty for no budget limit. You&apos;ll be alerted when approaching this
+                  amount.
                 </p>
               </div>
             </CardContent>

@@ -77,7 +77,9 @@ describe('Tracking Events', () => {
       expect(validLlmEvent).toHaveProperty('cost_usd');
       expect(validLlmEvent.prompt_tokens).toBeGreaterThanOrEqual(0);
       expect(validLlmEvent.completion_tokens).toBeGreaterThanOrEqual(0);
-      expect(validLlmEvent.total_tokens).toBe(validLlmEvent.prompt_tokens + validLlmEvent.completion_tokens);
+      expect(validLlmEvent.total_tokens).toBe(
+        validLlmEvent.prompt_tokens + validLlmEvent.completion_tokens
+      );
     });
 
     it('should support optional LLM debugging fields', () => {

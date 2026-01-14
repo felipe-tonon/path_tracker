@@ -55,7 +55,7 @@ export default function PathsPage() {
 
     try {
       const response = await fetch(`/api/v1/paths/${encodeURIComponent(searchQuery.trim())}`);
-      
+
       if (response.ok) {
         const data = await response.json();
         setPathData(data);
@@ -163,52 +163,58 @@ export default function PathsPage() {
           <CardContent>
             <div className="relative">
               {/* Timeline line */}
-              <div className="absolute left-6 top-0 bottom-0 w-0.5 bg-border" />
-              
+              <div className="absolute bottom-0 left-6 top-0 w-0.5 bg-border" />
+
               {/* Events */}
               <div className="space-y-6">
-                {pathData.path.map((event, index) => (
+                {pathData.path.map((event) => (
                   <div key={event.event_id} className="relative pl-14">
                     {/* Timeline dot */}
-                    <div className="absolute left-4 top-2 h-5 w-5 rounded-full border-2 border-background bg-primary flex items-center justify-center">
+                    <div className="absolute left-4 top-2 flex h-5 w-5 items-center justify-center rounded-full border-2 border-background bg-primary">
                       {event.type === 'llm' ? (
                         <Cpu className="h-3 w-3 text-primary-foreground" />
                       ) : (
                         <Globe className="h-3 w-3 text-primary-foreground" />
                       )}
                     </div>
-                    
+
                     {/* Event card */}
                     <div className="rounded-lg border bg-card p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1">
+                          <div className="mb-1 flex items-center gap-2">
                             <span className="font-medium">{event.service}</span>
                             <span className="rounded bg-muted px-2 py-0.5 text-xs">
                               {event.type.toUpperCase()}
                             </span>
-                            <span className={`font-mono text-sm ${getStatusColor(event.status_code)}`}>
+                            <span
+                              className={`font-mono text-sm ${getStatusColor(event.status_code)}`}
+                            >
                               {event.status_code}
                             </span>
                             {getStatusIcon(event.status_code)}
                           </div>
-                          
-                          <div className="text-sm text-muted-foreground mb-2">
-                            {event.method && <span className="font-medium mr-2">{event.method}</span>}
+
+                          <div className="mb-2 text-sm text-muted-foreground">
+                            {event.method && (
+                              <span className="mr-2 font-medium">{event.method}</span>
+                            )}
                             <span className="break-all">{event.url}</span>
                           </div>
-                          
+
                           {event.type === 'llm' && (
-                            <div className="flex gap-4 text-xs text-muted-foreground mt-2">
+                            <div className="mt-2 flex gap-4 text-xs text-muted-foreground">
                               {event.provider && <span>Provider: {event.provider}</span>}
                               {event.model && <span>Model: {event.model}</span>}
                               {event.total_tokens && <span>Tokens: {event.total_tokens}</span>}
-                              {event.cost_usd != null && <span>Cost: ${Number(event.cost_usd).toFixed(4)}</span>}
+                              {event.cost_usd != null && (
+                                <span>Cost: ${Number(event.cost_usd).toFixed(4)}</span>
+                              )}
                               {event.finish_reason && <span>Finish: {event.finish_reason}</span>}
                             </div>
                           )}
                         </div>
-                        
+
                         <div className="text-right text-sm">
                           <div className="font-medium">{event.latency_ms}ms</div>
                           <div className="text-xs text-muted-foreground">
@@ -229,9 +235,9 @@ export default function PathsPage() {
       {!loading && !error && !pathData && (
         <Card>
           <CardContent className="py-8 text-center">
-            <GitBranch className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-            <h3 className="text-lg font-medium mb-2">Search for a Request Path</h3>
-            <p className="text-muted-foreground max-w-md mx-auto">
+            <GitBranch className="mx-auto mb-4 h-12 w-12 text-muted-foreground" />
+            <h3 className="mb-2 text-lg font-medium">Search for a Request Path</h3>
+            <p className="mx-auto max-w-md text-muted-foreground">
               Enter a request_id above to see how a request flowed through your services.
               You&apos;ll see a timeline of all REST and LLM calls made during that request.
             </p>

@@ -70,7 +70,10 @@ const llmEventSchema = z.object({
 });
 
 const batchSchema = z.object({
-  events: z.array(z.union([restEventSchema, llmEventSchema])).min(1).max(100),
+  events: z
+    .array(z.union([restEventSchema, llmEventSchema]))
+    .min(1)
+    .max(100),
 });
 
 export async function POST(request: NextRequest) {

@@ -159,9 +159,9 @@ export async function retry<T>(
       return await fn();
     } catch (error) {
       lastError = error instanceof Error ? error : new Error(String(error));
-      
+
       if (attempt === maxAttempts) break;
-      
+
       await sleep(delay);
       delay = Math.min(delay * backoffMultiplier, maxDelayMs);
     }

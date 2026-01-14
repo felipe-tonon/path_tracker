@@ -4,7 +4,16 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Activity, Cpu, DollarSign, Clock, AlertTriangle, Users, RefreshCw, ArrowRight } from 'lucide-react';
+import {
+  Activity,
+  Cpu,
+  DollarSign,
+  Clock,
+  AlertTriangle,
+  Users,
+  RefreshCw,
+  ArrowRight,
+} from 'lucide-react';
 
 interface OverviewMetrics {
   rest_requests: number;
@@ -23,41 +32,42 @@ export default function OverviewPage() {
   const fetchMetrics = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Get metrics for the last 24 hours
       const now = new Date();
       const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      
+
       const params = new URLSearchParams({
         start_time: yesterday.toISOString(),
         end_time: now.toISOString(),
       });
-      
+
       const response = await fetch(`/api/v1/metrics?${params}`);
-      
+
       if (response.ok) {
         const data = await response.json();
-        
+
         // Calculate derived metrics
         const restTotal = data.metrics?.rest_requests?.total || 0;
         const llmTotal = data.metrics?.llm_requests?.total || 0;
         const totalRequests = restTotal + llmTotal;
-        
+
         // Calculate error rate from status codes
         const restByStatus = data.metrics?.rest_requests?.by_status || {};
         const errorCodes = Object.entries(restByStatus)
           .filter(([code]) => parseInt(code) >= 400)
           .reduce((sum, [, count]) => sum + (count as number), 0);
         const errorRate = totalRequests > 0 ? (errorCodes / totalRequests) * 100 : 0;
-        
+
         // Average latency (simple average of p50s)
         const restLatency = data.metrics?.rest_requests?.latency?.p50 || 0;
         const llmLatency = data.metrics?.llm_requests?.latency?.p50 || 0;
-        const avgLatency = restTotal > 0 || llmTotal > 0
-          ? Math.round((restLatency * restTotal + llmLatency * llmTotal) / (restTotal + llmTotal))
-          : 0;
-        
+        const avgLatency =
+          restTotal > 0 || llmTotal > 0
+            ? Math.round((restLatency * restTotal + llmLatency * llmTotal) / (restTotal + llmTotal))
+            : 0;
+
         setMetrics({
           rest_requests: restTotal,
           llm_requests: llmTotal,
@@ -109,7 +119,7 @@ export default function OverviewPage() {
         <div className="flex items-center gap-4">
           <span className="text-sm text-muted-foreground">Last 24 hours</span>
           <Button variant="outline" size="sm" onClick={fetchMetrics} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -133,10 +143,16 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? '...' : metrics ? formatNumber(metrics.rest_requests + metrics.llm_requests) : '--'}
+              {loading
+                ? '...'
+                : metrics
+                  ? formatNumber(metrics.rest_requests + metrics.llm_requests)
+                  : '--'}
             </div>
             <p className="text-xs text-muted-foreground">
-              {metrics && metrics.rest_requests > 0 ? `${formatNumber(metrics.rest_requests)} REST` : 'REST + LLM requests'}
+              {metrics && metrics.rest_requests > 0
+                ? `${formatNumber(metrics.rest_requests)} REST`
+                : 'REST + LLM requests'}
             </p>
           </CardContent>
         </Card>
@@ -174,7 +190,11 @@ export default function OverviewPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              {loading ? '...' : metrics && metrics.avg_latency > 0 ? formatLatency(metrics.avg_latency) : '--'}
+              {loading
+                ? '...'
+                : metrics && metrics.avg_latency > 0
+                  ? formatLatency(metrics.avg_latency)
+                  : '--'}
             </div>
             <p className="text-xs text-muted-foreground">p50 response time</p>
           </CardContent>
@@ -219,7 +239,7 @@ export default function OverviewPage() {
               example:
             </p>
             <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm">
-              <code>{`curl -X POST http://localhost:3001/api/v1/tracker/rest \\
+              <code>{`curl -X POST https://tracker.pathwave.io/api/v1/tracker/rest \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
   -d '{

@@ -6,7 +6,7 @@
  */
 
 import { auth, currentUser } from '@clerk/nextjs/server';
-import { getTenantIdByClerkUser, createTenantFromClerk, clerkUserExists } from './tenant';
+import { getTenantIdByClerkUser, createTenantFromClerk } from './tenant';
 
 // ─────────────────────────────────────
 // Types
@@ -43,6 +43,7 @@ export async function getClerkAuth(): Promise<ClerkAuth> {
     const userId = authResult.userId;
 
     if (!userId) {
+      // eslint-disable-next-line no-console
       console.log('Clerk auth: No userId found in session');
       return {
         authenticated: false,
@@ -52,7 +53,8 @@ export async function getClerkAuth(): Promise<ClerkAuth> {
         },
       };
     }
-    
+
+    // eslint-disable-next-line no-console
     console.log('Clerk auth: Found userId:', userId);
 
     // Check if user has a tenant

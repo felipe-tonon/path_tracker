@@ -5,9 +5,9 @@
  * Includes body truncation and size limit enforcement.
  */
 
-import { query, queryOne } from '@/lib/db';
+import { queryOne } from '@/lib/db';
 import { getTenantById } from '@/lib/auth/tenant';
-import type { RestEventInput, LlmEventInput, RestEvent, LlmEvent } from '@/types';
+import type { RestEventInput, LlmEventInput } from '@/types';
 
 // ─────────────────────────────────────
 // Body Processing

@@ -159,9 +159,9 @@ export async function PATCH(request: NextRequest) {
       [auth.tenant_id]
     );
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      settings: tenant 
+      settings: tenant,
     });
   } catch (error) {
     console.error('Error updating settings:', error);

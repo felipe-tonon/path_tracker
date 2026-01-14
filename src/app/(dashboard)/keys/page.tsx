@@ -188,88 +188,88 @@ export default function ApiKeysPage() {
             </Button>
           </DialogTrigger>
           <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Create API Key</DialogTitle>
-            <DialogDescription>
-              Create a new API key to authenticate tracking requests.
-            </DialogDescription>
-          </DialogHeader>
+            <DialogHeader>
+              <DialogTitle>Create API Key</DialogTitle>
+              <DialogDescription>
+                Create a new API key to authenticate tracking requests.
+              </DialogDescription>
+            </DialogHeader>
 
-          {!newKeyData ? (
-            <>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Key Name</Label>
-                  <Input
-                    id="name"
-                    placeholder="e.g., Production API Key"
-                    value={newKeyName}
-                    onChange={(e) => setNewKeyName(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateKey()}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Choose a descriptive name to identify this key
-                  </p>
-                </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setShowCreateDialog(false);
-                    setNewKeyName('');
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button onClick={handleCreateKey} disabled={creating}>
-                  {creating ? 'Creating...' : 'Create Key'}
-                </Button>
-              </DialogFooter>
-            </>
-          ) : (
-            <>
-              <div className="space-y-4 py-4">
-                <div className="rounded-lg bg-yellow-500/10 border border-yellow-500/20 p-4">
-                  <p className="text-sm font-medium text-yellow-600 dark:text-yellow-500 mb-2">
-                    ⚠️ Save this key now!
-                  </p>
-                  <p className="text-xs text-muted-foreground mb-3">
-                    You won't be able to see it again. Store it securely.
-                  </p>
-                  <div className="rounded bg-muted p-3 font-mono text-sm break-all">
-                    {newKeyData.key}
+            {!newKeyData ? (
+              <>
+                <div className="space-y-4 py-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="name">Key Name</Label>
+                    <Input
+                      id="name"
+                      placeholder="e.g., Production API Key"
+                      value={newKeyName}
+                      onChange={(e) => setNewKeyName(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleCreateKey()}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Choose a descriptive name to identify this key
+                    </p>
                   </div>
                 </div>
-              </div>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => handleCopy(newKeyData.key, newKeyData.key_id)}
-                >
-                  {copiedKey === newKeyData.key_id ? (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="mr-2 h-4 w-4" />
-                      Copy Key
-                    </>
-                  )}
-                </Button>
-                <Button
-                  onClick={() => {
-                    setNewKeyData(null);
-                    setShowCreateDialog(false);
-                  }}
-                >
-                  Done
-                </Button>
-              </DialogFooter>
-            </>
-          )}
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setShowCreateDialog(false);
+                      setNewKeyName('');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                  <Button onClick={handleCreateKey} disabled={creating}>
+                    {creating ? 'Creating...' : 'Create Key'}
+                  </Button>
+                </DialogFooter>
+              </>
+            ) : (
+              <>
+                <div className="space-y-4 py-4">
+                  <div className="rounded-lg border border-yellow-500/20 bg-yellow-500/10 p-4">
+                    <p className="mb-2 text-sm font-medium text-yellow-600 dark:text-yellow-500">
+                      ⚠️ Save this key now!
+                    </p>
+                    <p className="mb-3 text-xs text-muted-foreground">
+                      You won&apos;t be able to see it again. Store it securely.
+                    </p>
+                    <div className="break-all rounded bg-muted p-3 font-mono text-sm">
+                      {newKeyData.key}
+                    </div>
+                  </div>
+                </div>
+                <DialogFooter>
+                  <Button
+                    variant="outline"
+                    onClick={() => handleCopy(newKeyData.key, newKeyData.key_id)}
+                  >
+                    {copiedKey === newKeyData.key_id ? (
+                      <>
+                        <Check className="mr-2 h-4 w-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="mr-2 h-4 w-4" />
+                        Copy Key
+                      </>
+                    )}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setNewKeyData(null);
+                      setShowCreateDialog(false);
+                    }}
+                  >
+                    Done
+                  </Button>
+                </DialogFooter>
+              </>
+            )}
           </DialogContent>
         </Dialog>
       </div>

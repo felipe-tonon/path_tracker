@@ -7,7 +7,7 @@ import bcrypt from 'bcryptjs';
 describe('API Key Format', () => {
   it('should follow the correct format', () => {
     const apiKey = 'pwtrk_test1234567890abcdefghijklmno';
-    
+
     expect(apiKey).toMatch(/^pwtrk_[a-zA-Z0-9_-]+$/);
     expect(apiKey.length).toBeGreaterThan(12);
   });
@@ -15,7 +15,7 @@ describe('API Key Format', () => {
   it('should have correct prefix', () => {
     const apiKey = 'pwtrk_test1234567890abcdefghijklmno';
     const prefix = apiKey.slice(0, 12);
-    
+
     expect(prefix).toMatch(/^pwtrk_/);
     expect(prefix.length).toBe(12);
   });
@@ -47,7 +47,7 @@ describe('API Key Hashing', () => {
 
     // Different salts should produce different hashes
     expect(hash1).not.toBe(hash2);
-    
+
     // But both should verify the same key
     expect(await bcrypt.compare(key, hash1)).toBe(true);
     expect(await bcrypt.compare(key, hash2)).toBe(true);
@@ -58,7 +58,7 @@ describe('API Key Validation Logic', () => {
   it('should validate authorization header format', () => {
     const validHeader = 'Bearer pwtrk_test1234567890abcdefghijklmno';
     const parts = validHeader.split(' ');
-    
+
     expect(parts.length).toBe(2);
     expect(parts[0].toLowerCase()).toBe('bearer');
     expect(parts[1]).toMatch(/^pwtrk_/);

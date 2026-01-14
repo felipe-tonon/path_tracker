@@ -12,11 +12,11 @@ import {
   SheetTitle,
   SheetDescription,
 } from '@/components/ui/sheet';
-import { 
-  List, 
-  Search, 
-  RefreshCw, 
-  ChevronLeft, 
+import {
+  List,
+  Search,
+  RefreshCw,
+  ChevronLeft,
   ChevronRight,
   Clock,
   Globe,
@@ -32,7 +32,7 @@ import {
   DollarSign,
   Code,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -69,26 +69,26 @@ export default function LogsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const { toast } = useToast();
-  
+
   const [logs, setLogs] = useState<LogEntry[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [initialized, setInitialized] = useState(false);
-  
+
   // Detail panel
   const [selectedLog, setSelectedLog] = useState<LogEntry | null>(null);
   const [detailOpen, setDetailOpen] = useState(false);
   const [requestBodyExpanded, setRequestBodyExpanded] = useState(true);
   const [responseBodyExpanded, setResponseBodyExpanded] = useState(true);
-  
+
   // Filters - initialize from URL params
   const [searchQuery, setSearchQuery] = useState(() => searchParams.get('request_id') || '');
   const [userFilter, setUserFilter] = useState(() => searchParams.get('user_id') || '');
   const [typeFilter, setTypeFilter] = useState<'all' | 'rest' | 'llm'>('all');
   const [serviceFilter, setServiceFilter] = useState('');
   const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('24h');
-  
+
   // Pagination
   const [page, setPage] = useState(0);
   const limit = 50;
@@ -105,7 +105,7 @@ export default function LogsPage() {
     try {
       const now = new Date();
       let startTime: Date;
-      
+
       switch (timeRange) {
         case '1h':
           startTime = new Date(now.getTime() - 60 * 60 * 1000);
@@ -164,6 +164,7 @@ export default function LogsPage() {
     if (initialized) {
       fetchLogs();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialized, page, timeRange, typeFilter, userFilter, searchQuery]);
 
   const handleSearch = () => {
@@ -262,7 +263,7 @@ export default function LogsPage() {
           <p className="text-muted-foreground">Browse and filter request logs</p>
         </div>
         <Button variant="outline" onClick={fetchLogs} disabled={loading}>
-          <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
           Refresh
         </Button>
       </div>
@@ -272,7 +273,7 @@ export default function LogsPage() {
         <CardContent className="py-4">
           <div className="flex flex-wrap gap-4">
             {/* Search */}
-            <div className="flex gap-2 flex-1 min-w-[200px]">
+            <div className="flex min-w-[200px] flex-1 gap-2">
               <Input
                 placeholder="Search by request_id..."
                 value={searchQuery}
@@ -330,7 +331,7 @@ export default function LogsPage() {
 
           {/* Active Filters */}
           {(userFilter || searchQuery) && (
-            <div className="flex flex-wrap gap-2 mt-4 pt-4 border-t">
+            <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
               <span className="text-sm text-muted-foreground">Active filters:</span>
               {userFilter && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
@@ -372,18 +373,14 @@ export default function LogsPage() {
             <List className="h-5 w-5" />
             Request Logs
           </CardTitle>
-          <span className="text-sm text-muted-foreground">
-            {total} total logs
-          </span>
+          <span className="text-sm text-muted-foreground">{total} total logs</span>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="py-8 text-center text-muted-foreground">
-              Loading logs...
-            </div>
+            <div className="py-8 text-center text-muted-foreground">Loading logs...</div>
           ) : logs.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
-              <List className="mx-auto h-12 w-12 mb-4" />
+              <List className="mx-auto mb-4 h-12 w-12" />
               <p>No logs found for the selected filters.</p>
               <p className="text-sm">Try adjusting the time range or filters.</p>
             </div>
@@ -400,14 +397,14 @@ export default function LogsPage() {
                       <th className="pb-3 font-medium">User</th>
                       <th className="pb-3 font-medium">Request</th>
                       <th className="pb-3 font-medium">Status</th>
-                      <th className="pb-3 font-medium text-right">Latency</th>
+                      <th className="pb-3 text-right font-medium">Latency</th>
                     </tr>
                   </thead>
                   <tbody>
                     {logs.map((log) => (
-                      <tr 
-                        key={log.event_id} 
-                        className="border-b last:border-0 hover:bg-muted/50 cursor-pointer transition-colors"
+                      <tr
+                        key={log.event_id}
+                        className="cursor-pointer border-b transition-colors last:border-0 hover:bg-muted/50"
                         onClick={() => handleRowClick(log)}
                       >
                         <td className="py-3 text-sm">
@@ -417,7 +414,7 @@ export default function LogsPage() {
                           </div>
                         </td>
                         <td className="py-3">
-                          <span className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs bg-muted">
+                          <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-0.5 text-xs">
                             {log.type === 'llm' ? (
                               <Cpu className="h-3 w-3" />
                             ) : (
@@ -434,7 +431,7 @@ export default function LogsPage() {
                                 e.stopPropagation();
                                 handleUserClick(log.user_id!);
                               }}
-                              className="font-mono text-xs text-primary hover:underline hover:text-primary/80 transition-colors"
+                              className="font-mono text-xs text-primary transition-colors hover:text-primary/80 hover:underline"
                             >
                               {log.user_id}
                             </button>
@@ -445,24 +442,26 @@ export default function LogsPage() {
                         <td className="py-3 text-sm">
                           <div className="max-w-[300px] truncate">
                             {log.method && (
-                              <span className="font-medium text-muted-foreground mr-2">
+                              <span className="mr-2 font-medium text-muted-foreground">
                                 {log.method}
                               </span>
                             )}
                             <span className="text-muted-foreground">{log.url}</span>
                           </div>
-                          <div className="text-xs truncate">
+                          <div className="truncate text-xs">
                             <span className="text-muted-foreground">ID: </span>
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
                                 handleRequestClick(log.request_id);
                               }}
-                              className="font-mono text-primary hover:underline hover:text-primary/80 transition-colors"
+                              className="font-mono text-primary transition-colors hover:text-primary/80 hover:underline"
                             >
                               {log.request_id}
                             </button>
-                            {log.model && <span className="text-muted-foreground"> • {log.model}</span>}
+                            {log.model && (
+                              <span className="text-muted-foreground"> • {log.model}</span>
+                            )}
                           </div>
                         </td>
                         <td className="py-3">
@@ -472,12 +471,14 @@ export default function LogsPage() {
                             ) : (
                               <AlertCircle className="h-4 w-4 text-red-500" />
                             )}
-                            <span className={`font-mono text-sm ${getStatusColor(log.status_code)}`}>
+                            <span
+                              className={`font-mono text-sm ${getStatusColor(log.status_code)}`}
+                            >
                               {log.status_code}
                             </span>
                           </div>
                         </td>
-                        <td className="py-3 text-sm text-right font-mono">
+                        <td className="py-3 text-right font-mono text-sm">
                           {log.latency_ms}ms
                           {log.cost_usd != null && (
                             <div className="text-xs text-muted-foreground">
@@ -493,7 +494,7 @@ export default function LogsPage() {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                <div className="mt-4 flex items-center justify-between border-t pt-4">
                   <span className="text-sm text-muted-foreground">
                     Page {page + 1} of {totalPages}
                   </span>
@@ -501,7 +502,7 @@ export default function LogsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setPage(p => Math.max(0, p - 1))}
+                      onClick={() => setPage((p) => Math.max(0, p - 1))}
                       disabled={page === 0}
                     >
                       <ChevronLeft className="h-4 w-4" />
@@ -510,7 +511,7 @@ export default function LogsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                      onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
                       disabled={page >= totalPages - 1}
                     >
                       Next
@@ -531,17 +532,25 @@ export default function LogsPage() {
             <>
               <SheetHeader className="pb-4">
                 <div className="flex items-center gap-2">
-                  <span className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getStatusBgColor(selectedLog.status_code)}`}>
+                  <span
+                    className={`inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium ${getStatusBgColor(selectedLog.status_code)}`}
+                  >
                     {selectedLog.status_code}
                   </span>
                   <span className="inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-xs">
-                    {selectedLog.type === 'llm' ? <Cpu className="h-3 w-3" /> : <Globe className="h-3 w-3" />}
+                    {selectedLog.type === 'llm' ? (
+                      <Cpu className="h-3 w-3" />
+                    ) : (
+                      <Globe className="h-3 w-3" />
+                    )}
                     {selectedLog.type.toUpperCase()}
                   </span>
                 </div>
-                <SheetTitle className="text-left mt-2">
+                <SheetTitle className="mt-2 text-left">
                   {selectedLog.method && <span className="mr-2">{selectedLog.method}</span>}
-                  <span className="font-normal text-muted-foreground break-all">{selectedLog.url}</span>
+                  <span className="break-all font-normal text-muted-foreground">
+                    {selectedLog.url}
+                  </span>
                 </SheetTitle>
                 <SheetDescription className="text-left">
                   {selectedLog.service} • {selectedLog.latency_ms}ms
@@ -551,15 +560,17 @@ export default function LogsPage() {
               <div className="space-y-6">
                 {/* Request Info */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
                     <Hash className="h-4 w-4" />
                     Request Info
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Request ID</span>
                       <div className="flex items-center gap-2">
-                        <code className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedLog.request_id}</code>
+                        <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                          {selectedLog.request_id}
+                        </code>
                         <Button
                           variant="ghost"
                           size="sm"
@@ -570,12 +581,14 @@ export default function LogsPage() {
                         </Button>
                       </div>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Event ID</span>
-                      <code className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedLog.event_id}</code>
+                      <code className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                        {selectedLog.event_id}
+                      </code>
                     </div>
                     {selectedLog.environment && (
-                      <div className="flex items-center justify-between py-2 border-b">
+                      <div className="flex items-center justify-between border-b py-2">
                         <span className="text-muted-foreground">Environment</span>
                         <span>{selectedLog.environment}</span>
                       </div>
@@ -586,11 +599,11 @@ export default function LogsPage() {
                 {/* User Info */}
                 {selectedLog.user_id && (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold">
                       <User className="h-4 w-4" />
                       User
                     </h3>
-                    <div className="flex items-center justify-between py-2 border-b text-sm">
+                    <div className="flex items-center justify-between border-b py-2 text-sm">
                       <span className="text-muted-foreground">User ID</span>
                       <div className="flex items-center gap-2">
                         <button
@@ -617,20 +630,24 @@ export default function LogsPage() {
 
                 {/* Timing */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
                     <Clock className="h-4 w-4" />
                     Timing
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Request Time</span>
-                      <span className="font-mono text-xs">{formatFullTimestamp(selectedLog.request_timestamp)}</span>
+                      <span className="font-mono text-xs">
+                        {formatFullTimestamp(selectedLog.request_timestamp)}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Response Time</span>
-                      <span className="font-mono text-xs">{formatFullTimestamp(selectedLog.response_timestamp)}</span>
+                      <span className="font-mono text-xs">
+                        {formatFullTimestamp(selectedLog.response_timestamp)}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Latency</span>
                       <span className="font-mono font-medium">{selectedLog.latency_ms}ms</span>
                     </div>
@@ -639,28 +656,32 @@ export default function LogsPage() {
 
                 {/* Service Info */}
                 <div className="space-y-3">
-                  <h3 className="text-sm font-semibold flex items-center gap-2">
+                  <h3 className="flex items-center gap-2 text-sm font-semibold">
                     <Server className="h-4 w-4" />
                     Service
                   </h3>
                   <div className="space-y-2 text-sm">
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Service Name</span>
                       <span className="font-medium">{selectedLog.service}</span>
                     </div>
                     {selectedLog.method && (
-                      <div className="flex items-center justify-between py-2 border-b">
+                      <div className="flex items-center justify-between border-b py-2">
                         <span className="text-muted-foreground">Method</span>
                         <span className="font-mono">{selectedLog.method}</span>
                       </div>
                     )}
-                    <div className="flex items-start justify-between py-2 border-b">
-                      <span className="text-muted-foreground shrink-0 mr-4">URL</span>
-                      <span className="font-mono text-xs break-all text-right">{selectedLog.url}</span>
+                    <div className="flex items-start justify-between border-b py-2">
+                      <span className="mr-4 shrink-0 text-muted-foreground">URL</span>
+                      <span className="break-all text-right font-mono text-xs">
+                        {selectedLog.url}
+                      </span>
                     </div>
-                    <div className="flex items-center justify-between py-2 border-b">
+                    <div className="flex items-center justify-between border-b py-2">
                       <span className="text-muted-foreground">Status Code</span>
-                      <span className={`font-mono font-medium ${getStatusColor(selectedLog.status_code)}`}>
+                      <span
+                        className={`font-mono font-medium ${getStatusColor(selectedLog.status_code)}`}
+                      >
                         {selectedLog.status_code}
                       </span>
                     </div>
@@ -670,42 +691,48 @@ export default function LogsPage() {
                 {/* LLM Info (if applicable) */}
                 {selectedLog.type === 'llm' && (
                   <div className="space-y-3">
-                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-sm font-semibold">
                       <Cpu className="h-4 w-4" />
                       LLM Details
                     </h3>
                     <div className="space-y-2 text-sm">
                       {selectedLog.provider && (
-                        <div className="flex items-center justify-between py-2 border-b">
+                        <div className="flex items-center justify-between border-b py-2">
                           <span className="text-muted-foreground">Provider</span>
                           <span className="font-medium">{selectedLog.provider}</span>
                         </div>
                       )}
                       {selectedLog.model && (
-                        <div className="flex items-center justify-between py-2 border-b">
+                        <div className="flex items-center justify-between border-b py-2">
                           <span className="text-muted-foreground">Model</span>
                           <span className="font-mono">{selectedLog.model}</span>
                         </div>
                       )}
                       {selectedLog.total_tokens != null && (
-                        <div className="flex items-center justify-between py-2 border-b">
+                        <div className="flex items-center justify-between border-b py-2">
                           <span className="text-muted-foreground">Total Tokens</span>
-                          <span className="font-mono">{selectedLog.total_tokens.toLocaleString()}</span>
+                          <span className="font-mono">
+                            {selectedLog.total_tokens.toLocaleString()}
+                          </span>
                         </div>
                       )}
                       {selectedLog.cost_usd != null && (
-                        <div className="flex items-center justify-between py-2 border-b">
-                          <span className="text-muted-foreground flex items-center gap-1">
+                        <div className="flex items-center justify-between border-b py-2">
+                          <span className="flex items-center gap-1 text-muted-foreground">
                             <DollarSign className="h-3 w-3" />
                             Cost
                           </span>
-                          <span className="font-mono font-medium">${Number(selectedLog.cost_usd).toFixed(6)}</span>
+                          <span className="font-mono font-medium">
+                            ${Number(selectedLog.cost_usd).toFixed(6)}
+                          </span>
                         </div>
                       )}
                       {selectedLog.finish_reason && (
-                        <div className="flex items-center justify-between py-2 border-b">
+                        <div className="flex items-center justify-between border-b py-2">
                           <span className="text-muted-foreground">Finish Reason</span>
-                          <span className="font-mono text-xs bg-muted px-2 py-1 rounded">{selectedLog.finish_reason}</span>
+                          <span className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                            {selectedLog.finish_reason}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -717,7 +744,7 @@ export default function LogsPage() {
                   <div className="space-y-2">
                     <button
                       onClick={() => setRequestBodyExpanded(!requestBodyExpanded)}
-                      className="w-full flex items-center justify-between text-sm font-semibold hover:text-primary transition-colors"
+                      className="flex w-full items-center justify-between text-sm font-semibold transition-colors hover:text-primary"
                     >
                       <span className="flex items-center gap-2">
                         <Code className="h-4 w-4" />
@@ -731,14 +758,19 @@ export default function LogsPage() {
                     </button>
                     {requestBodyExpanded && (
                       <div className="relative">
-                        <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto max-h-[300px] overflow-y-auto">
+                        <pre className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-md bg-muted p-3 text-xs">
                           <code>{JSON.stringify(selectedLog.request_body, null, 2)}</code>
                         </pre>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="absolute top-1 right-1 h-6 w-6 p-0"
-                          onClick={() => copyToClipboard(JSON.stringify(selectedLog.request_body, null, 2), 'Request body')}
+                          className="absolute right-1 top-1 h-6 w-6 p-0"
+                          onClick={() =>
+                            copyToClipboard(
+                              JSON.stringify(selectedLog.request_body, null, 2),
+                              'Request body'
+                            )
+                          }
                         >
                           <Copy className="h-3 w-3" />
                         </Button>
@@ -752,7 +784,7 @@ export default function LogsPage() {
                   <div className="space-y-2">
                     <button
                       onClick={() => setResponseBodyExpanded(!responseBodyExpanded)}
-                      className="w-full flex items-center justify-between text-sm font-semibold hover:text-primary transition-colors"
+                      className="flex w-full items-center justify-between text-sm font-semibold transition-colors hover:text-primary"
                     >
                       <span className="flex items-center gap-2">
                         <Code className="h-4 w-4" />
@@ -766,14 +798,19 @@ export default function LogsPage() {
                     </button>
                     {responseBodyExpanded && (
                       <div className="relative">
-                        <pre className="text-xs bg-muted p-3 rounded-md overflow-x-auto max-h-[300px] overflow-y-auto">
+                        <pre className="max-h-[300px] overflow-x-auto overflow-y-auto rounded-md bg-muted p-3 text-xs">
                           <code>{JSON.stringify(selectedLog.response_body, null, 2)}</code>
                         </pre>
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="absolute top-1 right-1 h-6 w-6 p-0"
-                          onClick={() => copyToClipboard(JSON.stringify(selectedLog.response_body, null, 2), 'Response body')}
+                          className="absolute right-1 top-1 h-6 w-6 p-0"
+                          onClick={() =>
+                            copyToClipboard(
+                              JSON.stringify(selectedLog.response_body, null, 2),
+                              'Response body'
+                            )
+                          }
                         >
                           <Copy className="h-3 w-3" />
                         </Button>
@@ -783,7 +820,7 @@ export default function LogsPage() {
                 )}
 
                 {/* Actions */}
-                <div className="pt-4 flex gap-2">
+                <div className="flex gap-2 pt-4">
                   <Button
                     variant="outline"
                     size="sm"
@@ -793,13 +830,15 @@ export default function LogsPage() {
                       setDetailOpen(false);
                     }}
                   >
-                    <Search className="h-4 w-4 mr-2" />
+                    <Search className="mr-2 h-4 w-4" />
                     Filter by Request
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => window.open(`/paths?request_id=${selectedLog.request_id}`, '_blank')}
+                    onClick={() =>
+                      window.open(`/paths?request_id=${selectedLog.request_id}`, '_blank')
+                    }
                   >
                     <ExternalLink className="h-4 w-4" />
                   </Button>

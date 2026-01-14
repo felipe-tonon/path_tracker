@@ -90,9 +90,7 @@ export async function queryAll<T extends QueryResultRow = QueryResultRow>(
 /**
  * Execute a function within a database transaction
  */
-export async function withTransaction<T>(
-  fn: (client: PoolClient) => Promise<T>
-): Promise<T> {
+export async function withTransaction<T>(fn: (client: PoolClient) => Promise<T>): Promise<T> {
   const pool = getPool();
   const client = await pool.connect();
 

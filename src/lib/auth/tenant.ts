@@ -5,7 +5,7 @@
  * Used for dashboard authentication via Clerk sessions.
  */
 
-import { query, queryOne, withTransaction } from '@/lib/db';
+import { queryOne, withTransaction } from '@/lib/db';
 import { generateApiKey } from './api-key';
 import type { Tenant, AccountUser } from '@/types';
 
@@ -34,13 +34,10 @@ export async function getTenantIdByClerkUser(clerkUserId: string): Promise<strin
 /**
  * Get account user by Clerk user ID
  */
-export async function getAccountUserByClerkId(
-  clerkUserId: string
-): Promise<AccountUser | null> {
-  return queryOne<AccountUser>(
-    `SELECT * FROM account_users WHERE clerk_user_id = $1`,
-    [clerkUserId]
-  );
+export async function getAccountUserByClerkId(clerkUserId: string): Promise<AccountUser | null> {
+  return queryOne<AccountUser>(`SELECT * FROM account_users WHERE clerk_user_id = $1`, [
+    clerkUserId,
+  ]);
 }
 
 // ─────────────────────────────────────

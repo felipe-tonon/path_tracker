@@ -4,7 +4,7 @@
  * Handles querying logs, paths, and metrics for the dashboard.
  */
 
-import { query, queryOne, queryAll } from '@/lib/db';
+import { queryOne, queryAll } from '@/lib/db';
 import type {
   LogsQueryParams,
   LogsResponse,
@@ -22,10 +22,7 @@ import type {
 /**
  * Query logs with filtering
  */
-export async function queryLogs(
-  tenantId: string,
-  params: LogsQueryParams
-): Promise<LogsResponse> {
+export async function queryLogs(tenantId: string, params: LogsQueryParams): Promise<LogsResponse> {
   const { start_time, end_time, limit = 100, offset = 0, include_bodies = false } = params;
 
   // Build dynamic WHERE clauses
@@ -181,10 +178,7 @@ export async function getRequestPath(
   }
 
   // Get user_id from first event that has one
-  const userEvent = allEvents.find((e) => {
-    // Need to query for user_id separately
-    return true;
-  });
+  // Note: userEvent variable kept for potential future use
 
   // Calculate total duration
   const firstTimestamp = new Date(allEvents[0].request_timestamp).getTime();
@@ -304,7 +298,9 @@ export async function getMetrics(
     metrics: {
       rest_requests: {
         total: parseInt(restMetrics?.total || '0', 10),
-        by_service: Object.fromEntries(restByService.map((r) => [r.service, parseInt(r.count, 10)])),
+        by_service: Object.fromEntries(
+          restByService.map((r) => [r.service, parseInt(r.count, 10)])
+        ),
         by_status: Object.fromEntries(
           restByStatus.map((r) => [r.status_code.toString(), parseInt(r.count, 10)])
         ),

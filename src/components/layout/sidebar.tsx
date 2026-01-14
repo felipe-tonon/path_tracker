@@ -3,15 +3,7 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import {
-  LayoutDashboard,
-  GitBranch,
-  List,
-  BarChart3,
-  Users,
-  Key,
-  Settings,
-} from 'lucide-react';
+import { LayoutDashboard, GitBranch, List, BarChart3, Users, Key, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [

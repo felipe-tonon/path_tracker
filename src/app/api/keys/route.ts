@@ -97,12 +97,17 @@ export async function GET(request: NextRequest) {
   try {
     // Debug: Log cookies
     const cookies = request.cookies.getAll();
-    console.log('API /keys - Cookies:', cookies.map(c => c.name));
-    
+    // eslint-disable-next-line no-console
+    console.log(
+      'API /keys - Cookies:',
+      cookies.map((c) => c.name)
+    );
+
     // Authenticate
     const auth = await getClerkAuth();
+    // eslint-disable-next-line no-console
     console.log('API /keys - Auth result:', auth);
-    
+
     if (!auth.authenticated) {
       return NextResponse.json({ error: auth.error }, { status: 401 });
     }

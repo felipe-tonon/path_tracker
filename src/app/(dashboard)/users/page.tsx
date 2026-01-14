@@ -1,19 +1,19 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { 
-  Users, 
-  RefreshCw, 
-  Search, 
+import {
+  Users,
+  RefreshCw,
+  Search,
   Activity,
   Cpu,
   DollarSign,
   Clock,
-  TrendingUp
+  TrendingUp,
 } from 'lucide-react';
 
 interface UserStats {
@@ -40,14 +40,14 @@ export default function UsersPage() {
     router.push(`/logs?user_id=${encodeURIComponent(userId)}`);
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError(null);
 
     try {
       const now = new Date();
       let startTime: Date;
-      
+
       switch (timeRange) {
         case '7d':
           startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -82,17 +82,17 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchUsers();
   }, [timeRange]);
 
   useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  useEffect(() => {
     if (searchQuery) {
-      setFilteredUsers(users.filter(u => 
-        u.user_id.toLowerCase().includes(searchQuery.toLowerCase())
-      ));
+      setFilteredUsers(
+        users.filter((u) => u.user_id.toLowerCase().includes(searchQuery.toLowerCase()))
+      );
     } else {
       setFilteredUsers(users);
     }
@@ -126,7 +126,7 @@ export default function UsersPage() {
           <h1 className="text-3xl font-bold">Users</h1>
           <p className="text-muted-foreground">Analyze behavior and costs per end user</p>
         </div>
-        <div className="flex gap-4 items-center">
+        <div className="flex items-center gap-4">
           {/* Time Range */}
           <div className="flex gap-1">
             {(['7d', '30d', '90d'] as const).map((range) => (
@@ -141,7 +141,7 @@ export default function UsersPage() {
             ))}
           </div>
           <Button variant="outline" onClick={fetchUsers} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
         </div>
@@ -216,7 +216,7 @@ export default function UsersPage() {
                 {filteredUsers.length} users in the last {timeRange}
               </CardDescription>
             </div>
-            <div className="flex gap-2 items-center">
+            <div className="flex items-center gap-2">
               <Input
                 placeholder="Search by user_id..."
                 value={searchQuery}
@@ -229,16 +229,16 @@ export default function UsersPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <div className="py-8 text-center text-muted-foreground">
-              Loading user analytics...
-            </div>
+            <div className="py-8 text-center text-muted-foreground">Loading user analytics...</div>
           ) : filteredUsers.length === 0 ? (
             <div className="py-8 text-center text-muted-foreground">
-              <Users className="mx-auto h-12 w-12 mb-4" />
+              <Users className="mx-auto mb-4 h-12 w-12" />
               {users.length === 0 ? (
                 <>
                   <p>No users tracked yet.</p>
-                  <p className="text-sm">Include user_id in your tracking requests to see user analytics.</p>
+                  <p className="text-sm">
+                    Include user_id in your tracking requests to see user analytics.
+                  </p>
                 </>
               ) : (
                 <p>No users match your search.</p>
@@ -250,13 +250,13 @@ export default function UsersPage() {
                 <thead>
                   <tr className="border-b text-left text-sm text-muted-foreground">
                     <th className="pb-3 font-medium">User ID</th>
-                    <th className="pb-3 font-medium text-right">Requests</th>
-                    <th className="pb-3 font-medium text-right">REST</th>
-                    <th className="pb-3 font-medium text-right">LLM</th>
-                    <th className="pb-3 font-medium text-right">Tokens</th>
-                    <th className="pb-3 font-medium text-right">Cost</th>
-                    <th className="pb-3 font-medium text-right">First Seen</th>
-                    <th className="pb-3 font-medium text-right">Last Seen</th>
+                    <th className="pb-3 text-right font-medium">Requests</th>
+                    <th className="pb-3 text-right font-medium">REST</th>
+                    <th className="pb-3 text-right font-medium">LLM</th>
+                    <th className="pb-3 text-right font-medium">Tokens</th>
+                    <th className="pb-3 text-right font-medium">Cost</th>
+                    <th className="pb-3 text-right font-medium">First Seen</th>
+                    <th className="pb-3 text-right font-medium">Last Seen</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -265,7 +265,7 @@ export default function UsersPage() {
                       <td className="py-3">
                         <button
                           onClick={() => handleUserClick(user.user_id)}
-                          className="font-mono text-sm text-primary hover:underline hover:text-primary/80 transition-colors"
+                          className="font-mono text-sm text-primary transition-colors hover:text-primary/80 hover:underline"
                         >
                           {user.user_id}
                         </button>
