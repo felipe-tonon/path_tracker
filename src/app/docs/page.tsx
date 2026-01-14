@@ -44,7 +44,7 @@ export default function DocsLanding() {
               Try the dashboard
             </Link>
             <a
-              href="https://github.com/pathwave/path-tracker/blob/main/docs/UI_GUIDE.md"
+              href="https://github.com/felipe-tonon/path_tracker/blob/main/docs/UI_GUIDE.md"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center rounded-md border border-input px-4 py-2 text-sm font-medium hover:bg-muted transition"
@@ -101,7 +101,7 @@ export default function DocsLanding() {
 
         <div className="mt-10 flex flex-wrap gap-3 text-sm">
           <a 
-            href="https://github.com/pathwave/path-tracker/blob/main/docs/UI_GUIDE.md" 
+            href="https://github.com/felipe-tonon/path_tracker/blob/main/docs/UI_GUIDE.md" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-primary hover:underline"
@@ -110,7 +110,7 @@ export default function DocsLanding() {
           </a>
           <span className="text-muted-foreground">•</span>
           <a 
-            href="https://github.com/pathwave/path-tracker/blob/main/docs/API_DOCUMENTATION.md" 
+            href="https://github.com/felipe-tonon/path_tracker/blob/main/docs/API_DOCUMENTATION.md" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-primary hover:underline"
@@ -119,7 +119,7 @@ export default function DocsLanding() {
           </a>
           <span className="text-muted-foreground">•</span>
           <a 
-            href="https://github.com/pathwave/path-tracker" 
+            href="https://github.com/felipe-tonon/path_tracker" 
             target="_blank" 
             rel="noopener noreferrer" 
             className="text-primary hover:underline"
