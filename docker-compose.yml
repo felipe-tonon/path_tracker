@@ -1,0 +1,75 @@
+# ═══════════════════════════════════════════════════════════════
+# Path Tracker - Docker Compose for Local Development
+# ═══════════════════════════════════════════════════════════════
+# Usage:
+#   docker-compose up -d          # Start all services
+#   docker-compose down           # Stop all services
+#   docker-compose logs -f web    # View web logs
+# ═══════════════════════════════════════════════════════════════
+
+version: '3.8'
+
+services:
+  # ─────────────────────────────────────
+  # PostgreSQL Database
+  # ─────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: pathtracker-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: pathtracker
+      POSTGRES_PASSWORD: pathtracker
+      POSTGRES_DB: pathtracker
+    ports:
+      - "5438:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pathtracker -d pathtracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - pathtracker-network
+
+  # ─────────────────────────────────────
+  # Path Tracker Web Application
+  # ─────────────────────────────────────
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pathtracker-web
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://pathtracker:pathtracker@postgres:5432/pathtracker
+      # Note: Internal container uses 5432, host maps to 5433
+      # Clerk credentials (override in .env.local or via docker-compose.override.yml)
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      CLERK_SECRET_KEY: ${CLERK_SECRET_KEY}
+      CLERK_WEBHOOK_SECRET: ${CLERK_WEBHOOK_SECRET}
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - pathtracker-network
+
+networks:
+  pathtracker-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local
