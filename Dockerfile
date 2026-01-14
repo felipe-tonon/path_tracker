@@ -14,7 +14,9 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
+# Use npm install instead of npm ci to resolve platform-specific packages
+# (package-lock.json may contain darwin-arm64 deps from Mac development)
+RUN npm install --frozen-lockfile 2>/dev/null || npm install
 
 # ─────────────────────────────────────
 # Stage 2: Builder
