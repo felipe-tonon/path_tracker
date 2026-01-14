@@ -164,6 +164,7 @@ Authorization: Bearer <api_key>
 ## Documentation
 
 - [Functional Requirements](./docs/FUNCTIONAL_REQUIREMENTS.md) - Detailed feature specifications
+- [UI Guide](./docs/UI_GUIDE.md) - Screenshots and feature tour
 - API Documentation (coming soon)
 - Integration Guide (coming soon)
 
@@ -173,4 +174,4 @@ Authorization: Bearer <api_key>
 
 ## License
 
-TBD
+Licensed under the Apache License, Version 2.0. See `LICENSE` for full terms and `NOTICE` for attribution.
