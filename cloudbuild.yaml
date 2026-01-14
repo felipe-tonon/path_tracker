@@ -1,0 +1,81 @@
+# ═══════════════════════════════════════════════════════════════
+# Path Tracker - Cloud Build Configuration
+# Triggered on push to main branch
+# ═══════════════════════════════════════════════════════════════
+
+steps:
+  # ─────────────────────────────────────
+  # Step 1: Build Docker image
+  # ─────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:$COMMIT_SHA'
+      - '-t'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:latest'
+      - '--cache-from'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:latest'
+      - '.'
+    id: 'build-image'
+
+  # ─────────────────────────────────────
+  # Step 2: Push Docker image to Artifact Registry
+  # ─────────────────────────────────────
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker'
+    id: 'push-image'
+    waitFor: ['build-image']
+
+  # ─────────────────────────────────────
+  # Step 3: Deploy to Cloud Run
+  # ─────────────────────────────────────
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: 'gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'pathtracker'
+      - '--image'
+      - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:$COMMIT_SHA'
+      - '--region'
+      - 'europe-west1'
+      - '--platform'
+      - 'managed'
+      - '--allow-unauthenticated'
+      - '--add-cloudsql-instances'
+      - 'path-tracker-484312:europe-west1:pathtracker-db'
+      - '--set-secrets'
+      - 'DATABASE_URL=database-url:latest,NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=clerk-publishable-key:latest,CLERK_SECRET_KEY=clerk-secret-key:latest,CLERK_WEBHOOK_SECRET=clerk-webhook-secret:latest'
+      - '--set-env-vars'
+      - 'NODE_ENV=production,NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in,NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up,NEXT_PUBLIC_CLERK_AFTER_SIGN_IN_URL=/,NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL=/'
+      - '--memory'
+      - '512Mi'
+      - '--cpu'
+      - '1'
+      - '--min-instances'
+      - '0'
+      - '--max-instances'
+      - '10'
+      - '--port'
+      - '3000'
+    id: 'deploy-cloud-run'
+    waitFor: ['push-image']
+
+# ─────────────────────────────────────
+# Build options
+# ─────────────────────────────────────
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: 'E2_HIGHCPU_8'
+
+# Timeout for the entire build (15 minutes)
+timeout: '900s'
+
+# Images to be pushed (for caching)
+images:
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:$COMMIT_SHA'
+  - 'europe-west1-docker.pkg.dev/$PROJECT_ID/pathtracker/pathtracker:latest'
