@@ -10,13 +10,11 @@ FROM node:20-alpine AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# Copy package files
-COPY package.json package-lock.json* ./
+# Copy package files (only package.json, not lock file with platform-specific deps)
+COPY package.json ./
 
-# Install dependencies
-# Use npm install instead of npm ci to resolve platform-specific packages
-# (package-lock.json may contain darwin-arm64 deps from Mac development)
-RUN npm install --frozen-lockfile 2>/dev/null || npm install
+# Install dependencies fresh for Linux platform
+RUN npm install
 
 # ─────────────────────────────────────
 # Stage 2: Builder
