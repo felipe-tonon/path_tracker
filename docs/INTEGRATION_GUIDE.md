@@ -104,8 +104,8 @@ Send a POST request to `/api/v1/tracker/rest` after each HTTP request your servi
 | `method` | string | HTTP method (`GET`, `POST`, `PUT`, `DELETE`, etc.) |
 | `url` | string | The request URL or path |
 | `status_code` | integer | HTTP response status code |
-| `request_timestamp` | string | ISO 8601 timestamp when request was received |
-| `response_timestamp` | string | ISO 8601 timestamp when response was sent |
+| `request_timestamp` | string | ISO 8601 timestamp with milliseconds and UTC timezone (format: `YYYY-MM-DDTHH:mm:ss.sssZ`, example: `2026-01-14T23:45:53.671Z`) |
+| `response_timestamp` | string | ISO 8601 timestamp with milliseconds and UTC timezone (format: `YYYY-MM-DDTHH:mm:ss.sssZ`, example: `2026-01-14T23:45:53.750Z`) |
 
 ### Optional Fields
 
@@ -155,8 +155,8 @@ Send a POST request to `/api/v1/tracker/llm` after each LLM API call.
 | `url` | string | LLM API URL |
 | `endpoint` | string | API endpoint (e.g., `/v1/chat/completions`) |
 | `status_code` | integer | HTTP response status code |
-| `request_timestamp` | string | ISO 8601 timestamp when call started |
-| `response_timestamp` | string | ISO 8601 timestamp when response received |
+| `request_timestamp` | string | ISO 8601 timestamp with milliseconds and UTC timezone when call started (format: `YYYY-MM-DDTHH:mm:ss.sssZ`, example: `2026-01-14T23:45:53.671Z`) |
+| `response_timestamp` | string | ISO 8601 timestamp with milliseconds and UTC timezone when response received (format: `YYYY-MM-DDTHH:mm:ss.sssZ`, example: `2026-01-14T23:45:53.750Z`) |
 | `provider` | string | LLM provider (`openai`, `anthropic`, `google`, etc.) |
 | `model` | string | Model name (e.g., `gpt-4o`, `claude-3-opus`) |
 | `prompt_tokens` | integer | Number of input tokens |
@@ -383,12 +383,32 @@ Please analyze the codebase and implement Path Tracker integration following the
 
 ## Troubleshooting
 
+### Timestamp Format Issues
+
+If you get a 400 error about invalid timestamps:
+
+1. **Ensure correct format**: `YYYY-MM-DDTHH:mm:ss.sssZ`
+   - ✅ Correct: `2026-01-14T23:45:53.671Z`
+   - ❌ Wrong: `2026-01-14T23:45:53Z` (missing milliseconds)
+   - ❌ Wrong: `2026-01-14T23:45:53.671+00:00` (wrong timezone format)
+
+2. **Requirements**:
+   - Exactly **3 digits** for milliseconds (e.g., `.671`, not `.67` or `.6710`)
+   - Must end with **`Z`** (UTC timezone indicator)
+   - Use **24-hour** time format
+   - ISO 8601 format with timezone
+
+3. **Implementation examples**:
+   - **JavaScript**: `new Date().toISOString()` → `2026-01-14T23:45:53.671Z`
+   - **Python**: `datetime.now(timezone.utc).isoformat().replace('+00:00', 'Z')`
+   - **Go**: `time.Now().UTC().Format(time.RFC3339Nano)[:23] + "Z"`
+
 ### Events not appearing in dashboard
 
 1. Check your API key is correct
 2. Verify the `PATH_TRACKER_URL` is reachable
 3. Check server logs for tracking errors
-4. Ensure timestamps are valid ISO 8601 format
+4. **Ensure timestamps are valid ISO 8601 format with milliseconds** (see Timestamp Format Issues above)
 
 ### Missing request chains
 
