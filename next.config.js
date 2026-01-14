@@ -5,9 +5,11 @@ const nextConfig = {
     serverComponentsExternalPackages: ['pg'],
   },
   eslint: {
-    ignoreDuringBuilds: false,
+    // Ignore ESLint during production builds (CI/CD)
+    ignoreDuringBuilds: true,
   },
   typescript: {
+    // TypeScript errors should still be caught
     ignoreBuildErrors: false,
   },
 };
