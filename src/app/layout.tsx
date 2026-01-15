@@ -31,6 +31,16 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en" suppressHydrationWarning>
+        <head>
+          {/* https://vibesmonitor.com script */}
+          <script
+            id="vibesmonitor-script"
+            data-project-id="d652ebdc-1a78-4a45-94cf-3d0aeafc4183"
+            src="https://vibesmonitor.com/script/v1/vibesmonitor.js"
+            type="text/javascript"
+            defer
+          />
+        </head>
         <body className={`${inter.variable} ${jetbrainsMono.variable} font-sans antialiased`}>
           <ThemeProvider
             attribute="class"
