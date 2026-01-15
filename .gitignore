@@ -47,3 +47,6 @@ data/
 
 # Docker volumes
 postgres_data/
+
+# Build configuration
+cloudbuild.yaml

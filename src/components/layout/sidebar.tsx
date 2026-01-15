@@ -1,9 +1,19 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { UserButton, SignedIn, SignedOut, SignInButton } from '@clerk/nextjs';
-import { LayoutDashboard, GitBranch, List, BarChart3, Users, Key, Settings } from 'lucide-react';
+import {
+  LayoutDashboard,
+  GitBranch,
+  List,
+  BarChart3,
+  Users,
+  Key,
+  Settings,
+  ShieldCheck,
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const navigation = [
@@ -16,8 +26,32 @@ const navigation = [
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
+const adminNavigation = [
+  { name: 'Admin', href: '/admin', icon: ShieldCheck },
+];
+
 export function Sidebar() {
   const pathname = usePathname();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const response = await fetch('/api/admin/check');
+        if (response.ok) {
+          const data = await response.json();
+          setIsAdmin(data.isAdmin);
+        }
+      } catch {
+        // Silently fail - user is not admin
+        setIsAdmin(false);
+      }
+    };
+
+    checkAdminStatus();
+  }, []);
+
+  const allNavigation = isAdmin ? [...navigation, ...adminNavigation] : navigation;
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card">
@@ -36,8 +70,9 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 p-4">
-        {navigation.map((item) => {
+        {allNavigation.map((item) => {
           const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+          const isAdminItem = item.href === '/admin';
           return (
             <Link
               key={item.name}
@@ -46,10 +81,11 @@ export function Sidebar() {
                 'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
                 isActive
                   ? 'bg-primary/10 text-primary'
-                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+                  : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground',
+                isAdminItem && !isActive && 'text-amber-600 hover:text-amber-500 dark:text-amber-500 dark:hover:text-amber-400'
               )}
             >
-              <item.icon className="h-5 w-5" />
+              <item.icon className={cn('h-5 w-5', isAdminItem && !isActive && 'text-amber-500')} />
               {item.name}
             </Link>
           );
