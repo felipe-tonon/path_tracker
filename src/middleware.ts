@@ -4,6 +4,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 const isPublicRoute = createRouteMatcher([
   '/sign-in(.*)',
   '/sign-up(.*)',
+  '/docs(.*)',
   '/api/health',
   '/api/v1/tracker/(.*)', // Tracking endpoints use API key auth, not Clerk
 ]);
