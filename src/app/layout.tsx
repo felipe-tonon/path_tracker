@@ -16,6 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://tracker.pathwave.io'),
   title: 'Path Tracker | Pathwave.io',
   description: 'Track and visualize request paths across your distributed system',
   icons: {
