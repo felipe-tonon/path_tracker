@@ -168,6 +168,30 @@ Authorization: Bearer <api_key>
 - API Documentation (coming soon)
 - Integration Guide (coming soon)
 
+## Authentication Setup (Clerk)
+
+Path Tracker uses [Clerk](https://clerk.com) for dashboard authentication. To set up authentication:
+
+1. **Create a Clerk account** at [clerk.com](https://clerk.com) and create a new application
+
+2. **Get your API keys** from the Clerk Dashboard:
+   - Go to **Configure** → **API Keys**
+   - Copy your **Publishable Key** (starts with `pk_`)
+   - Copy your **Secret Key** (starts with `sk_`)
+
+3. **Add the keys to your environment**:
+   ```bash
+   # .env.local
+   NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=pk_test_...
+   CLERK_SECRET_KEY=sk_test_...
+   ```
+
+4. **(Optional) Set up webhooks** for user sync:
+   - In Clerk Dashboard, go to **Configure** → **Webhooks**
+   - Add endpoint: `https://your-domain.com/api/webhooks/clerk`
+   - Select events: `user.created`, `user.updated`, `user.deleted`
+   - Copy the **Signing Secret** to `CLERK_WEBHOOK_SECRET`
+
 ## Status
 
 🚧 **In Development** - Actively building core features
