@@ -87,7 +87,10 @@ export default function LogsPage() {
   const [userFilter, setUserFilter] = useState(() => searchParams.get('user_id') || '');
   const [typeFilter, setTypeFilter] = useState<'all' | 'rest' | 'llm'>('all');
   const [serviceFilter, setServiceFilter] = useState('');
-  const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d'>('24h');
+  const [statusFilter, setStatusFilter] = useState<number | null>(null);
+  const [timeRange, setTimeRange] = useState<'1h' | '6h' | '24h' | '7d' | 'custom'>('24h');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
 
   // Pagination
   const [page, setPage] = useState(0);
@@ -105,24 +108,30 @@ export default function LogsPage() {
     try {
       const now = new Date();
       let startTime: Date;
+      let endTime: Date = now;
 
-      switch (timeRange) {
-        case '1h':
-          startTime = new Date(now.getTime() - 60 * 60 * 1000);
-          break;
-        case '6h':
-          startTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
-          break;
-        case '7d':
-          startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-          break;
-        default: // 24h
-          startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+      if (timeRange === 'custom' && dateFrom) {
+        startTime = new Date(dateFrom);
+        endTime = dateTo ? new Date(dateTo + 'T23:59:59') : now;
+      } else {
+        switch (timeRange) {
+          case '1h':
+            startTime = new Date(now.getTime() - 60 * 60 * 1000);
+            break;
+          case '6h':
+            startTime = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+            break;
+          case '7d':
+            startTime = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            break;
+          default: // 24h
+            startTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        }
       }
 
       const params = new URLSearchParams({
         start_time: startTime.toISOString(),
-        end_time: now.toISOString(),
+        end_time: endTime.toISOString(),
         limit: limit.toString(),
         offset: (page * limit).toString(),
         include_bodies: 'true',
@@ -139,6 +148,9 @@ export default function LogsPage() {
       }
       if (userFilter) {
         params.set('user_id', userFilter);
+      }
+      if (statusFilter !== null) {
+        params.set('status_code', statusFilter.toString());
       }
 
       const response = await fetch(`/api/v1/logs?${params}`);
@@ -165,7 +177,7 @@ export default function LogsPage() {
       fetchLogs();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialized, page, timeRange, typeFilter, userFilter, searchQuery]);
+  }, [initialized, page, timeRange, typeFilter, userFilter, searchQuery, serviceFilter, statusFilter, dateFrom, dateTo]);
 
   const handleSearch = () => {
     setPage(0);
@@ -201,6 +213,28 @@ export default function LogsPage() {
     const params = new URLSearchParams(window.location.search);
     params.delete('request_id');
     router.push(params.toString() ? `/logs?${params.toString()}` : '/logs');
+  };
+
+  const handleStatusClick = (statusCode: number) => {
+    setStatusFilter(statusCode);
+    setPage(0);
+  };
+
+  const clearStatusFilter = () => {
+    setStatusFilter(null);
+    setPage(0);
+  };
+
+  const clearServiceFilter = () => {
+    setServiceFilter('');
+    setPage(0);
+  };
+
+  const clearDateFilter = () => {
+    setDateFrom('');
+    setDateTo('');
+    setTimeRange('24h');
+    setPage(0);
   };
 
   const formatTimestamp = (ts: string) => {
@@ -286,7 +320,7 @@ export default function LogsPage() {
             </div>
 
             {/* Time Range */}
-            <div className="flex gap-1">
+            <div className="flex items-center gap-1">
               {(['1h', '6h', '24h', '7d'] as const).map((range) => (
                 <Button
                   key={range}
@@ -294,12 +328,39 @@ export default function LogsPage() {
                   size="sm"
                   onClick={() => {
                     setTimeRange(range);
+                    setDateFrom('');
+                    setDateTo('');
                     setPage(0);
                   }}
                 >
                   {range}
                 </Button>
               ))}
+              <div className="ml-2 flex items-center gap-1">
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => {
+                    setDateFrom(e.target.value);
+                    if (e.target.value) setTimeRange('custom');
+                    setPage(0);
+                  }}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="From"
+                />
+                <span className="text-muted-foreground">–</span>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => {
+                    setDateTo(e.target.value);
+                    if (dateFrom) setTimeRange('custom');
+                    setPage(0);
+                  }}
+                  className="h-8 rounded-md border border-input bg-background px-2 text-sm focus:outline-none focus:ring-1 focus:ring-ring"
+                  placeholder="To"
+                />
+              </div>
             </div>
 
             {/* Type Filter */}
@@ -330,7 +391,7 @@ export default function LogsPage() {
           </div>
 
           {/* Active Filters */}
-          {(userFilter || searchQuery) && (
+          {(userFilter || searchQuery || statusFilter !== null || serviceFilter || timeRange === 'custom') && (
             <div className="mt-4 flex flex-wrap gap-2 border-t pt-4">
               <span className="text-sm text-muted-foreground">Active filters:</span>
               {userFilter && (
@@ -345,6 +406,30 @@ export default function LogsPage() {
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                   Request: {searchQuery}
                   <button onClick={clearRequestFilter} className="ml-1 hover:text-primary/80">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {statusFilter !== null && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Status: {statusFilter}
+                  <button onClick={clearStatusFilter} className="ml-1 hover:text-primary/80">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {serviceFilter && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Service: {serviceFilter}
+                  <button onClick={clearServiceFilter} className="ml-1 hover:text-primary/80">
+                    <X className="h-3 w-3" />
+                  </button>
+                </span>
+              )}
+              {timeRange === 'custom' && dateFrom && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  Date: {dateFrom}{dateTo ? ` – ${dateTo}` : ' onwards'}
+                  <button onClick={clearDateFilter} className="ml-1 hover:text-primary/80">
                     <X className="h-3 w-3" />
                   </button>
                 </span>
@@ -465,18 +550,25 @@ export default function LogsPage() {
                           </div>
                         </td>
                         <td className="py-3">
-                          <div className="flex items-center gap-1">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleStatusClick(log.status_code);
+                            }}
+                            className="flex items-center gap-1 rounded px-1 transition-colors hover:bg-muted"
+                            title={`Filter by status ${log.status_code}`}
+                          >
                             {log.status_code >= 200 && log.status_code < 300 ? (
                               <CheckCircle className="h-4 w-4 text-green-500" />
                             ) : (
                               <AlertCircle className="h-4 w-4 text-red-500" />
                             )}
                             <span
-                              className={`font-mono text-sm ${getStatusColor(log.status_code)}`}
+                              className={`font-mono text-sm ${getStatusColor(log.status_code)} hover:underline`}
                             >
                               {log.status_code}
                             </span>
-                          </div>
+                          </button>
                         </td>
                         <td className="py-3 text-right font-mono text-sm">
                           {log.latency_ms}ms
